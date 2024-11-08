@@ -1,4 +1,3 @@
-<!-- dictionary.html -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,9 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kashmiri Dictionary</title>
+    
+    <!-- External CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&family=Scheherazade&display=swap" rel="stylesheet">
+    
+    <!-- Internal CSS -->
     <style>
         body {
             background-color: #f4f7fc;
@@ -81,9 +84,6 @@
         .dark-mode .alphabet-scroll-sidebar {
             background: #555;
         }
-        .alphabet-scroll-sidebar:hover {
-            right: 0;
-        }
         .alphabet-scroll-sidebar a {
             display: block;
             padding: 5px;
@@ -95,15 +95,7 @@
         .alphabet-scroll-sidebar a:hover {
             text-decoration: underline;
         }
-        @media (max-width: 768px) {
-            .table-wrapper {
-                max-height: calc(100vh - 450px);
-            }
-            h1 {
-                font-size: 1.5rem;
-            }
-        }
-        .loader, .font-loader {
+        .loader {
             border: 5px solid #f3f3f3;
             border-top: 5px solid #3498db;
             border-radius: 50%;
@@ -113,7 +105,7 @@
             margin: 20px auto;
             display: none;
         }
-        .loading-message, .font-loading-message {
+        .loading-message {
             text-align: center;
             font-weight: bold;
             margin-top: 20px;
@@ -148,13 +140,23 @@
         .dark-mode-switch:hover {
             background: #555;
         }
+        @media (max-width: 768px) {
+            .table-wrapper {
+                max-height: calc(100vh - 450px);
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
     </style>
 </head>
-
-<body>
+  
+  <body>
+    <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <a class="navbar-brand" href="#">Kashmiri Dictionary</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" 
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
@@ -169,9 +171,13 @@
         </div>
     </nav>
     
+    <!-- Main Container -->
     <div class="container-fluid">
+        <!-- Home Section -->
         <div id="homeSection">
             <h1 class="text-center">Kashmiri Dictionary <i class="fas fa-book"></i></h1>
+            
+            <!-- Font Selection -->
             <div class="font-option">
                 <label for="fontSelect">Choose Font for Kashmiri and Urdu:</label>
                 <select id="fontSelect" class="form-control d-inline-block w-auto">
@@ -180,17 +186,25 @@
                     <option value="naksh">Naksh</option>
                 </select>
             </div>
+            
+            <!-- Search Box -->
             <div class="form-group">
-                <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search by word, translation or example...">
+                <input type="text" id="searchInput" class="form-control" 
+                       placeholder="🔍 Search by word, translation or example...">
             </div>
+            
+            <!-- Loading Indicators -->
             <div class="loader" id="loader"></div>
-            <div class="loading-message" id="loadingMessage">Please keep patience, the dictionary is loading...</div>
+            <div class="loading-message" id="loadingMessage">
+                Please keep patience, the dictionary is loading...
+            </div>
+            
+            <!-- Dictionary Table -->
             <div class="table-wrapper">
                 <table class="table table-bordered table-hover">
                     <thead class="thead-dark">
                         <tr>
                             <th>Serial No</th>
-                            <th>Correlated Words Num</th>
                             <th>Word</th>
                             <th>Word Type</th>
                             <th>English Example</th>
@@ -205,26 +219,34 @@
                         </tr>
                     </thead>
                     <tbody id="dictionaryTable">
-                        <!-- Dynamic rows will be appended here -->
+                        <!-- Dynamic content will be inserted here -->
                     </tbody>
                 </table>
             </div>
         </div>
+
+        <!-- About Section -->
         <div id="aboutSection" style="display: none;">
             <div class="container">
                 <h1 class="mt-4">About Kashmiri Dictionary</h1>
                 <p>
-                    This Kashmiri Dictionary web application aims to provide an easy-to-use platform to search for Kashmiri words along with their English meanings, examples, Urdu translations, Chinese, and Turkish words/examples. The purpose of this project is to help people learn the Kashmiri language and provide a resource that allows users to look up words efficiently.
+                    This Kashmiri Dictionary web application aims to provide an easy-to-use platform 
+                    to search for Kashmiri words along with their English meanings, examples, 
+                    Urdu translations, Chinese, and Turkish words/examples. The purpose of this project 
+                    is to help people learn the Kashmiri language and provide a resource that allows 
+                    users to look up words efficiently.
                 </p>
                 <p>
-                    This dictionary currently has thousands of entries covering common words, translations, and usage examples. It is built using HTML, CSS, JavaScript, and relies on Bootstrap for a responsive interface that works on both desktop and mobile devices.
+                    This dictionary currently has thousands of entries covering common words, translations, 
+                    and usage examples. It is built using HTML, CSS, JavaScript, and relies on Bootstrap 
+                    for a responsive interface that works on both desktop and mobile devices.
                 </p>
             </div>
         </div>
     </div>
 
+    <!-- Alphabet Scroll Sidebar -->
     <div class="alphabet-scroll-sidebar" style="height: 300px; overflow-y: auto;">
-        <!-- Scroll bar with A-Z letters -->
         <a href="#">A</a>
         <a href="#">B</a>
         <a href="#">C</a>
@@ -253,128 +275,170 @@
         <a href="#">Z</a>
     </div>
 
+    <!-- Dark Mode Toggle Button -->
     <button class="dark-mode-switch" id="darkModeToggle">🌙</button>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const loader = document.getElementById("loader");
-            const loadingMessage = document.getElementById("loadingMessage");
-            loader.style.display = "block";
-            loadingMessage.style.display = "block";
-
-          document.addEventListener("DOMContentLoaded", function () {
-    const loader = document.getElementById("loader");
-    const loadingMessage = document.getElementById("loadingMessage");
-    const tableBody = document.getElementById("dictionaryTable");
     
-    loader.style.display = "block";
-    loadingMessage.style.display = "block";
-
-    async function fetchDictionaryData() {
-        try {
-            // Fetch from local JSON file
-            const response = await fetch('kashmiri_dictionary_multilingual.json');
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error('Error fetching dictionary data:', error);
-            loadingMessage.textContent = "Error loading dictionary data. Please try again later.";
-            return [];
-        }
-    }
-
-    // Function to populate table with data
-    function populateTable(data) {
-        tableBody.innerHTML = ''; // Clear existing content
-        data.forEach((entry, index) => {
-            const rowElement = document.createElement("tr");
-            rowElement.innerHTML = `
-                <td>${index + 1}</td>
-                <td>${entry.seq_num}</td>
-                <td>${entry.word}</td>
-                <td>${entry.word_type}</td>
-                <td>${entry.english_example}</td>
-                <td class="kashmiri-font">${entry.kashmiri_word}</td>
-                <td class="kashmiri-font">${entry.kashmiri_example}</td>
-                <td class="urdu-font">${entry.urdu_word}</td>
-                <td class="urdu-font">${entry.urdu_translation}</td>
-                <td>${entry.chinese_word}</td>
-                <td>${entry.chinese_example}</td>
-                <td>${entry.turkish_word}</td>
-                <td>${entry.turkish_example}</td>
-            `;
-            tableBody.appendChild(rowElement);
-        });
-    }
-
-    // Fetch and display data
-    fetchDictionaryData().then(data => {
-        populateTable(data);
-        loader.style.display = "none";
-        loadingMessage.style.display = "none";
-    });
-
-    // Rest of your existing code remains the same...
-});
-
-            // Alphabet scroll click handling
-            document.querySelector(".alphabet-scroll-sidebar").addEventListener("click", function (event) {
-                if (event.target.tagName === 'A') {
-                    const letter = event.target.textContent.toLowerCase();
-                    const rows = document.querySelectorAll("#dictionaryTable tr");
-                    rows.forEach(row => {
-                        const word = row.children[2].textContent.toLowerCase();
-                        row.style.display = word.startsWith(letter) ? "" : "none";
-                    });
-                }
-            });
-
-            // Slide toggle for Home and About sections
-            document.querySelectorAll(".slide-toggle").forEach(link => {
-                link.addEventListener("click", function () {
-                    const target = document.querySelector(this.getAttribute("data-target"));
-                    document.querySelectorAll(".container-fluid > div").forEach(section => {
-                        section.style.display = "none";
-                    });
-                    target.style.display = "block";
-                });
-            });
-
-            // Font selection for Kashmiri and Urdu text
-            document.getElementById("fontSelect").addEventListener("change", function () {
-                const selectedFont = this.value;
-                const kashmiriElements = document.querySelectorAll(".kashmiri-font");
-                const urduElements = document.querySelectorAll(".urdu-font");
-                if (selectedFont === "nastaliq") {
-                    kashmiriElements.forEach(el => el.style.fontFamily = "'Noto Nastaliq Urdu', serif");
-                    urduElements.forEach(el => el.style.fontFamily = "'Noto Nastaliq Urdu', serif");
-                } else if (selectedFont === "naksh") {
-                    kashmiriElements.forEach(el => el.style.fontFamily = "'Scheherazade', sans-serif");
-                    urduElements.forEach(el => el.style.fontFamily = "'Scheherazade', sans-serif");
-                } else {
-                    kashmiriElements.forEach(el => el.style.fontFamily = "inherit");
-                    urduElements.forEach(el => el.style.fontFamily = "inherit");
-                }
-            });
-
-            // Dark mode toggle
-            const darkModeToggle = document.getElementById("darkModeToggle");
-            darkModeToggle.addEventListener("click", function () {
-                document.body.classList.toggle("dark-mode");
-                const elements = document.querySelectorAll(".table-wrapper, #searchInput, .alphabet-scroll-sidebar, .navbar, .dark-mode-switch, .table thead, .slide-toggle, .container-fluid, .font-option");
-                elements.forEach(el => el.classList.toggle("dark-mode"));
-                const tableHeaders = document.querySelectorAll(".table thead th");
-                tableHeaders.forEach(th => th.classList.toggle("dark-mode"));
-            });
-        });
-    </script>
-
+    
+    
+    
+    <!-- Required Scripts -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
 
+    <!-- Main Application Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Initialize elements
+            const loader = document.getElementById("loader");
+            const loadingMessage = document.getElementById("loadingMessage");
+            const tableBody = document.getElementById("dictionaryTable");
+            
+            // Show loading indicators
+            loader.style.display = "block";
+            loadingMessage.style.display = "block";
+
+            // Fetch dictionary data from JSON file
+            async function fetchDictionaryData() {
+                try {
+                    const response = await fetch('kashmiri_dictionary_multilingual.json');
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    const data = await response.json();
+                    return data;
+                } catch (error) {
+                    console.error('Error loading dictionary:', error);
+                    loadingMessage.textContent = "Error loading dictionary data. Please try again later.";
+                    loadingMessage.style.color = "red";
+                    loader.style.display = "none";
+                    return [];
+                }
+            }
+
+            // Function to populate table with data
+            function populateTable(data) {
+                tableBody.innerHTML = ''; // Clear existing content
+                data.forEach((entry, index) => {
+                    const rowElement = document.createElement("tr");
+                    rowElement.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${entry.word || ''}</td>
+                        <td>${entry.word_type || ''}</td>
+                        <td>${entry.english_example || ''}</td>
+                        <td class="kashmiri-font">${entry.kashmiri_word || ''}</td>
+                        <td class="kashmiri-font">${entry.kashmiri_example || ''}</td>
+                        <td class="urdu-font">${entry['URDU WORD'] || ''}</td>
+                        <td class="urdu-font">${entry.urdu_translation || ''}</td>
+                        <td>${entry.chinese_word || ''}</td>
+                        <td>${entry.chinese_example || ''}</td>
+                        <td>${entry.turkish_word || ''}</td>
+                        <td>${entry.turkish_example || ''}</td>
+                    `;
+                    tableBody.appendChild(rowElement);
+                });
+            }
+
+            // Initialize the dictionary
+            fetchDictionaryData().then(data => {
+                if (data.length > 0) {
+                    populateTable(data);
+                    // Store data for search functionality
+                    window.dictionaryData = data;
+                }
+                loader.style.display = "none";
+                loadingMessage.style.display = "none";
+            });
+
+            // Search functionality
+            const searchInput = document.getElementById("searchInput");
+            searchInput.addEventListener("input", function() {
+                const searchTerm = this.value.toLowerCase().trim();
+                
+                if (window.dictionaryData) {
+                    const filteredData = window.dictionaryData.filter(entry => {
+                        return (
+                            (entry.word || '').toLowerCase().includes(searchTerm) ||
+                            (entry.english_example || '').toLowerCase().includes(searchTerm) ||
+                            (entry.kashmiri_word || '').includes(searchTerm) ||
+                            (entry.kashmiri_example || '').includes(searchTerm) ||
+                            (entry['URDU WORD'] || '').includes(searchTerm) ||
+                            (entry.urdu_translation || '').includes(searchTerm) ||
+                            (entry.chinese_word || '').includes(searchTerm) ||
+                            (entry.turkish_word || '').includes(searchTerm)
+                        );
+                    });
+                    
+                    populateTable(filteredData);
+                }
+            });
+
+            // Alphabet scroll functionality
+            document.querySelector(".alphabet-scroll-sidebar").addEventListener("click", function(event) {
+                if (event.target.tagName === 'A') {
+                    event.preventDefault();
+                    const letter = event.target.textContent.toLowerCase();
+                    
+                    if (window.dictionaryData) {
+                        const filteredData = window.dictionaryData.filter(entry =>
+                            (entry.word || '').toLowerCase().startsWith(letter)
+                        );
+                        populateTable(filteredData);
+                    }
+                }
+            });
+
+            // Font selection functionality
+            document.getElementById("fontSelect").addEventListener("change", function() {
+                const selectedFont = this.value;
+                const kashmiriElements = document.querySelectorAll(".kashmiri-font");
+                const urduElements = document.querySelectorAll(".urdu-font");
+                
+                let fontFamily = 'inherit';
+                if (selectedFont === "nastaliq") {
+                    fontFamily = "'Noto Nastaliq Urdu', serif";
+                } else if (selectedFont === "naksh") {
+                    fontFamily = "'Scheherazade', sans-serif";
+                }
+
+                kashmiriElements.forEach(el => el.style.fontFamily = fontFamily);
+                urduElements.forEach(el => el.style.fontFamily = fontFamily);
+            });
+
+            // Dark mode toggle functionality
+            const darkModeToggle = document.getElementById("darkModeToggle");
+            darkModeToggle.addEventListener("click", function() {
+                document.body.classList.toggle("dark-mode");
+                
+                const elements = document.querySelectorAll(
+                    ".table-wrapper, #searchInput, .alphabet-scroll-sidebar, " +
+                    ".navbar, .dark-mode-switch, .table thead, " +
+                    ".slide-toggle, .container-fluid, .font-option"
+                );
+                
+                elements.forEach(el => el.classList.toggle("dark-mode"));
+                
+                // Update dark mode button
+                this.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
+            });
+
+            // Section toggle functionality (Home/About)
+            document.querySelectorAll(".slide-toggle").forEach(link => {
+                link.addEventListener("click", function() {
+                    const targetId = this.getAttribute("data-target");
+                    document.querySelectorAll(".container-fluid > div").forEach(section => {
+                        section.style.display = "none";
+                    });
+                    document.querySelector(targetId).style.display = "block";
+                    
+                    // Update active state in navigation
+                    document.querySelectorAll(".nav-item").forEach(item => {
+                        item.classList.remove("active");
+                    });
+                    this.parentElement.classList.add("active");
+                });
+            });
+        });
+    </script>
+</body>
 </html>
