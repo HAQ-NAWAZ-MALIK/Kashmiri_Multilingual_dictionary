@@ -159,11 +159,6 @@
       z-index: 4;
     }
 
-    .dark-mode {
-      background-color: #2b2b2b;
-      color: #ffffff;
-    }
-
     .dark-mode-switch:hover {
       background: #555;
     }
@@ -334,14 +329,19 @@
       // Show loading indicators
       loader.style.display = "block";
       loadingMessage.style.display = "block";
-      // Fetch dictionary data from JSON file
+
+      // Fetch dictionary data from JSON file with caching enabled
       async function fetchDictionaryData() {
+        if (window.dictionaryData) {
+          return window.dictionaryData;
+        }
         try {
           const response = await fetch('kashmiri_dictionary_multilingual.json');
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
           const data = await response.json();
+          window.dictionaryData = data; // Cache the data
           return data;
         } catch (error) {
           console.error('Error loading dictionary:', error);
@@ -351,9 +351,11 @@
           return [];
         }
       }
+
       // Function to populate table with data
       function populateTable(data) {
         tableBody.innerHTML = ''; // Clear existing content
+        const fragment = document.createDocumentFragment();
         data.forEach((entry, index) => {
           const rowElement = document.createElement("tr");
           rowElement.innerHTML = `
@@ -370,56 +372,62 @@
                         <td>${entry.turkish_word || ''}</td>
                         <td>${entry.turkish_example || ''}</td>
                     `;
-          tableBody.appendChild(rowElement);
+          fragment.appendChild(rowElement);
         });
+        tableBody.appendChild(fragment);
       }
+
       // Initialize the dictionary
       fetchDictionaryData().then(data => {
         if (data.length > 0) {
           populateTable(data);
-          // Store data for search functionality
-          window.dictionaryData = data;
         }
         loader.style.display = "none";
         loadingMessage.style.display = "none";
       });
-      // Search functionality
+
+      // Search functionality with debouncing for performance improvement
       const searchInput = document.getElementById("searchInput");
       const advancedSearchSelect = document.getElementById("advancedSearchSelect");
+      let debounceTimer;
       searchInput.addEventListener("input", function() {
-        const searchTerm = this.value.toLowerCase().trim();
-        const searchBy = advancedSearchSelect.value;
-        if (window.dictionaryData) {
-          const filteredData = window.dictionaryData.filter(entry => {
-            switch (searchBy) {
-              case 'word':
-                return (entry.word || '').toLowerCase().includes(searchTerm);
-              case 'word_type':
-                return (entry.word_type || '').toLowerCase().includes(searchTerm);
-              case 'kashmiri_word':
-                return (entry.kashmiri_word || '').toLowerCase().includes(searchTerm);
-              case 'urdu_translation':
-                return (entry.urdu_translation || '').toLowerCase().includes(searchTerm);
-              case 'chinese_word':
-                return (entry.chinese_word || '').toLowerCase().includes(searchTerm);
-              case 'turkish_word':
-                return (entry.turkish_word || '').toLowerCase().includes(searchTerm);
-              default:
-                return (
-                  (entry.word || '').toLowerCase().includes(searchTerm) ||
-                  (entry.english_example || '').toLowerCase().includes(searchTerm) ||
-                  (entry.kashmiri_word || '').toLowerCase().includes(searchTerm) ||
-                  (entry.kashmiri_example || '').toLowerCase().includes(searchTerm) ||
-                  (entry['URDU WORD'] || '').toLowerCase().includes(searchTerm) ||
-                  (entry.urdu_translation || '').toLowerCase().includes(searchTerm) ||
-                  (entry.chinese_word || '').toLowerCase().includes(searchTerm) ||
-                  (entry.turkish_word || '').toLowerCase().includes(searchTerm)
-                );
-            }
-          });
-          populateTable(filteredData);
-        }
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          const searchTerm = this.value.toLowerCase().trim();
+          const searchBy = advancedSearchSelect.value;
+          if (window.dictionaryData) {
+            const filteredData = window.dictionaryData.filter(entry => {
+              switch (searchBy) {
+                case 'word':
+                  return (entry.word || '').toLowerCase().includes(searchTerm);
+                case 'word_type':
+                  return (entry.word_type || '').toLowerCase().includes(searchTerm);
+                case 'kashmiri_word':
+                  return (entry.kashmiri_word || '').toLowerCase().includes(searchTerm);
+                case 'urdu_translation':
+                  return (entry.urdu_translation || '').toLowerCase().includes(searchTerm);
+                case 'chinese_word':
+                  return (entry.chinese_word || '').toLowerCase().includes(searchTerm);
+                case 'turkish_word':
+                  return (entry.turkish_word || '').toLowerCase().includes(searchTerm);
+                default:
+                  return (
+                    (entry.word || '').toLowerCase().includes(searchTerm) ||
+                    (entry.english_example || '').toLowerCase().includes(searchTerm) ||
+                    (entry.kashmiri_word || '').toLowerCase().includes(searchTerm) ||
+                    (entry.kashmiri_example || '').toLowerCase().includes(searchTerm) ||
+                    (entry['URDU WORD'] || '').toLowerCase().includes(searchTerm) ||
+                    (entry.urdu_translation || '').toLowerCase().includes(searchTerm) ||
+                    (entry.chinese_word || '').toLowerCase().includes(searchTerm) ||
+                    (entry.turkish_word || '').toLowerCase().includes(searchTerm)
+                  );
+              }
+            });
+            populateTable(filteredData);
+          }
+        }, 300); // 300ms debounce delay
       });
+
       // Alphabet scroll functionality
       document.querySelector(".alphabet-scroll-sidebar").addEventListener("click", function(event) {
         if (event.target.tagName === 'A') {
@@ -433,6 +441,7 @@
           }
         }
       });
+
       // Font selection functionality
       document.getElementById("fontSelect").addEventListener("change", function() {
         const selectedFont = this.value;
@@ -447,6 +456,7 @@
         kashmiriElements.forEach(el => el.style.fontFamily = fontFamily);
         urduElements.forEach(el => el.style.fontFamily = fontFamily);
       });
+
       // Dark mode toggle functionality
       const darkModeToggle = document.getElementById("darkModeToggle");
       darkModeToggle.addEventListener("click", function() {
@@ -460,6 +470,7 @@
         // Update dark mode button
         this.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
       });
+
       // Section toggle functionality (Home/About)
       document.querySelectorAll(".slide-toggle").forEach(link => {
         link.addEventListener("click", function() {
