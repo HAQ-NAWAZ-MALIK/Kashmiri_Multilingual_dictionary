@@ -320,7 +320,7 @@
   <button class="dark-mode-switch" id="darkModeToggle">🌙</button>
 
   <!-- Required Scripts -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
@@ -397,23 +397,23 @@
               case 'word_type':
                 return (entry.word_type || '').toLowerCase().includes(searchTerm);
               case 'kashmiri_word':
-                return (entry.kashmiri_word || '').includes(searchTerm);
+                return (entry.kashmiri_word || '').toLowerCase().includes(searchTerm);
               case 'urdu_translation':
-                return (entry.urdu_translation || '').includes(searchTerm);
+                return (entry.urdu_translation || '').toLowerCase().includes(searchTerm);
               case 'chinese_word':
-                return (entry.chinese_word || '').includes(searchTerm);
+                return (entry.chinese_word || '').toLowerCase().includes(searchTerm);
               case 'turkish_word':
-                return (entry.turkish_word || '').includes(searchTerm);
+                return (entry.turkish_word || '').toLowerCase().includes(searchTerm);
               default:
                 return (
                   (entry.word || '').toLowerCase().includes(searchTerm) ||
                   (entry.english_example || '').toLowerCase().includes(searchTerm) ||
-                  (entry.kashmiri_word || '').includes(searchTerm) ||
-                  (entry.kashmiri_example || '').includes(searchTerm) ||
-                  (entry['URDU WORD'] || '').includes(searchTerm) ||
-                  (entry.urdu_translation || '').includes(searchTerm) ||
-                  (entry.chinese_word || '').includes(searchTerm) ||
-                  (entry.turkish_word || '').includes(searchTerm)
+                  (entry.kashmiri_word || '').toLowerCase().includes(searchTerm) ||
+                  (entry.kashmiri_example || '').toLowerCase().includes(searchTerm) ||
+                  (entry['URDU WORD'] || '').toLowerCase().includes(searchTerm) ||
+                  (entry.urdu_translation || '').toLowerCase().includes(searchTerm) ||
+                  (entry.chinese_word || '').toLowerCase().includes(searchTerm) ||
+                  (entry.turkish_word || '').toLowerCase().includes(searchTerm)
                 );
             }
           });
