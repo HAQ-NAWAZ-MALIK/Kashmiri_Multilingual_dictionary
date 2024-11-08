@@ -355,31 +355,7 @@
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
-          const reader = response.body.getReader();
-          const contentLength = +response.headers.get('Content-Length');
-
-          let receivedLength = 0;
-          let chunks = [];
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) {
-              break;
-            }
-            chunks.push(value);
-            receivedLength += value.length;
-            const percentage = Math.floor((receivedLength / contentLength) * 100);
-            loadingPercentage.textContent = `${percentage}%`;
-          }
-
-          const chunksAll = new Uint8Array(receivedLength);
-          let position = 0;
-          for (let chunk of chunks) {
-            chunksAll.set(chunk, position);
-            position += chunk.length;
-          }
-
-          const text = new TextDecoder("utf-8").decode(chunksAll);
-          const data = JSON.parse(text);
+          const data = await response.json();
           window.dictionaryData = data; // Cache the data
           return data;
         } catch (error) {
@@ -425,46 +401,42 @@
         loadingMessage.style.display = "none";
       });
 
-      // Search functionality with debouncing for performance improvement
+      // Search functionality
       const searchInput = document.getElementById("searchInput");
       const advancedSearchSelect = document.getElementById("advancedSearchSelect");
-      let debounceTimer;
       searchInput.addEventListener("input", function() {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          const searchTerm = this.value.toLowerCase().trim();
-          const searchBy = advancedSearchSelect.value;
-          if (window.dictionaryData) {
-            const filteredData = window.dictionaryData.filter(entry => {
-              switch (searchBy) {
-                case 'word':
-                  return (entry.word || '').toLowerCase().includes(searchTerm);
-                case 'word_type':
-                  return (entry.word_type || '').toLowerCase().includes(searchTerm);
-                case 'kashmiri_word':
-                  return (entry.kashmiri_word || '').toLowerCase().includes(searchTerm);
-                case 'urdu_translation':
-                  return (entry.urdu_translation || '').toLowerCase().includes(searchTerm);
-                case 'chinese_word':
-                  return (entry.chinese_word || '').toLowerCase().includes(searchTerm);
-                case 'turkish_word':
-                  return (entry.turkish_word || '').toLowerCase().includes(searchTerm);
-                default:
-                  return (
-                    (entry.word || '').toLowerCase().includes(searchTerm) ||
-                    (entry.english_example || '').toLowerCase().includes(searchTerm) ||
-                    (entry.kashmiri_word || '').toLowerCase().includes(searchTerm) ||
-                    (entry.kashmiri_example || '').toLowerCase().includes(searchTerm) ||
-                    (entry['URDU WORD'] || '').toLowerCase().includes(searchTerm) ||
-                    (entry.urdu_translation || '').toLowerCase().includes(searchTerm) ||
-                    (entry.chinese_word || '').toLowerCase().includes(searchTerm) ||
-                    (entry.turkish_word || '').toLowerCase().includes(searchTerm)
-                  );
-              }
-            });
-            populateTable(filteredData);
-          }
-        }, 300); // 300ms debounce delay
+        const searchTerm = this.value.toLowerCase().trim();
+        const searchBy = advancedSearchSelect.value;
+        if (window.dictionaryData) {
+          const filteredData = window.dictionaryData.filter(entry => {
+            switch (searchBy) {
+              case 'word':
+                return (entry.word || '').toLowerCase().includes(searchTerm);
+              case 'word_type':
+                return (entry.word_type || '').toLowerCase().includes(searchTerm);
+              case 'kashmiri_word':
+                return (entry.kashmiri_word || '').toLowerCase().includes(searchTerm);
+              case 'urdu_translation':
+                return (entry.urdu_translation || '').toLowerCase().includes(searchTerm);
+              case 'chinese_word':
+                return (entry.chinese_word || '').toLowerCase().includes(searchTerm);
+              case 'turkish_word':
+                return (entry.turkish_word || '').toLowerCase().includes(searchTerm);
+              default:
+                return (
+                  (entry.word || '').toLowerCase().includes(searchTerm) ||
+                  (entry.english_example || '').toLowerCase().includes(searchTerm) ||
+                  (entry.kashmiri_word || '').toLowerCase().includes(searchTerm) ||
+                  (entry.kashmiri_example || '').toLowerCase().includes(searchTerm) ||
+                  (entry['URDU WORD'] || '').toLowerCase().includes(searchTerm) ||
+                  (entry.urdu_translation || '').toLowerCase().includes(searchTerm) ||
+                  (entry.chinese_word || '').toLowerCase().includes(searchTerm) ||
+                  (entry.turkish_word || '').toLowerCase().includes(searchTerm)
+                );
+            }
+          });
+          populateTable(filteredData);
+        }
       });
 
       // Alphabet scroll functionality
