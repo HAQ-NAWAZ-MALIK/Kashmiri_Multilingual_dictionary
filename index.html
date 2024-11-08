@@ -341,31 +341,68 @@
 
   <!-- Main Application Script -->
   <script>
-    <script>
-  document.addEventListener("DOMContentLoaded", function() {
-    // Initialize elements
-    const loader = document.getElementById("loader");
-    const loadingMessage = document.getElementById("loadingMessage");
-    const loadingPercentage = document.getElementById("loadingPercentage");
-    const tableBody = document.getElementById("dictionaryTable");
-    let debounceTimer;
+    document.addEventListener("DOMContentLoaded", function() {
+      // Initialize elements
+      const loader = document.getElementById("loader");
+      const loadingMessage = document.getElementById("loadingMessage");
+      const loadingPercentage = document.getElementById("loadingPercentage");
+      const tableBody = document.getElementById("dictionaryTable");
+      let debounceTimer;
+
+      // Show loading indicators
+      loader.style.display = "block";
+      loadingMessage.style.display = "block";
+
+      // Fetch dictionary data from JSON file with caching enabled
+      async function fetchDictionaryData() {
+        if (window.dictionaryData) {
+          return window.dictionaryData;
+        }
+        try {
+          const response = await fetch('kashmiri_dictionary_multilingual.json');
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          window.dictionaryData = data; // Cache the data
+          return data;
+        } catch (error) {
+          console.error('Error loading dictionary:', error);
+          loadingMessage.textContent = "Error loading dictionary data. Please try again later.";
+          loadingMessage.style.color = "red";
+          loader.style.display = "none";
+          return [];
+        }
+      }
+
+      // Function to populate table with data
+      function populateTable(data) {
+        tableBody.innerHTML = ''; // Clear existing content
+        const fragment = document.createDocumentFragment();
+        data.forEach((entry, index) => {
+          const rowElement = document.createElement("tr");
+          rowElement.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${entry.word || ''}</td>
+                        <td>${entry.word_type || ''}</td>
+                        <td>${entry.english_example || ''}</td>
+                        <td class="kashmiri-font">${entry.kashmiri_word || ''}</td>
+                        <td class="kashmiri-font">${entry.kashmiri_example || ''}</td>
+                        <td class="urdu-font">${entry['URDU WORD'] || ''}</td>
+                        <td class="urdu-font">${entry.urdu_translation || ''}</td>
+                        <td>${entry.chinese_word || ''}</td>
+                        <td>${entry.chinese_example || ''}</td>
+                        <td>${entry.turkish_word || ''}</td>
+                        <td>${entry.turkish_example || ''}</td>
+                    `;
+          fragment.appendChild(rowElement);
+        });
+        tableBody.appendChild(fragment);
+      }
 
     // Create a new Web Worker
     const searchWorker = new Worker('search-worker.js');
-
-    // Initialize dictionary data
-    fetch('kashmiri_dictionary_multilingual.json')
-      .then(response => response.json())
-      .then(data => {
-        searchWorker.postMessage({ type: 'init', data: data });
-      })
-      .catch(error => {
-        console.error('Error loading dictionary:', error);
-        loadingMessage.textContent = "Error loading dictionary data. Please try again later.";
-        loadingMessage.style.color = "red";
-        loader.style.display = "none";
-      });
-
+      
     // Listen for messages from the worker
     searchWorker.onmessage = function(e) {
       const { type, data } = e.data;
@@ -377,108 +414,102 @@
         populateTable(data.results);
       }
     };
-
-    // Function to populate table with data
-    function populateTable(data) {
-      tableBody.innerHTML = ''; // Clear existing content
-      const fragment = document.createDocumentFragment();
-      data.forEach((entry, index) => {
-        const rowElement = document.createElement("tr");
-        rowElement.innerHTML = `
-                      <td>${index + 1}</td>
-                      <td>${entry.word || ''}</td>
-                      <td>${entry.word_type || ''}</td>
-                      <td>${entry.english_example || ''}</td>
-                      <td class="kashmiri-font">${entry.kashmiri_word || ''}</td>
-                      <td class="kashmiri-font">${entry.kashmiri_example || ''}</td>
-                      <td class="urdu-font">${entry['URDU WORD'] || ''}</td>
-                      <td class="urdu-font">${entry.urdu_translation || ''}</td>
-                      <td>${entry.chinese_word || ''}</td>
-                      <td>${entry.chinese_example || ''}</td>
-                      <td>${entry.turkish_word || ''}</td>
-                      <td>${entry.turkish_example || ''}</td>
-                  `;
-        fragment.appendChild(rowElement);
+      
+      
+      // Initialize the dictionary
+      fetchDictionaryData().then(data => {
+        if (data.length > 0) {
+          populateTable(data);
+        }
+        loader.style.display = "none";
+        loadingMessage.style.display = "none";
       });
-      tableBody.appendChild(fragment);
-    }
 
-    // Search functionality with debouncing
-    const searchInput = document.getElementById("searchInput");
-    const searchModeSelect = document.getElementById("searchModeSelect");
-    const resultsPerPageSelect = document.getElementById("resultsPerPage");
+      // Search functionality with debouncing
+      const searchInput = document.getElementById("searchInput");
+      const searchModeSelect = document.getElementById("searchModeSelect");
+      searchInput.addEventListener("input", function() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+          const searchTerm = this.value.toLowerCase().trim();
+          const searchMode = searchModeSelect.value;
+          if (window.dictionaryData) {
+            const filteredData = window.dictionaryData.filter(entry => {
+              let entryField = (entry.word || '').toLowerCase();
+              switch (searchMode) {
+                case 'starts_with':
+                  return entryField.startsWith(searchTerm);
+                case 'exact_match':
+                  return entryField === searchTerm;
+                case 'contains':
+                default:
+                  return entryField.includes(searchTerm);
+              }
+            });
+            populateTable(filteredData);
+          }
+        }, 300); // Debounce for 300ms
+      });
 
-    searchInput.addEventListener("input", function() {
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(() => {
-        performSearch();
-      }, 300); // Debounce for 300ms
-    });
-
-    function performSearch() {
-      const searchTerm = searchInput.value.toLowerCase().trim();
-      const searchMode = searchModeSelect.value;
-      const resultsPerPage = parseInt(resultsPerPageSelect.value, 10);
-      const page = 1; // You can change this or make it dynamic as per pagination needs
-
-      searchWorker.postMessage({
-        type: 'search',
-        data: {
-          searchTerm,
-          searchField: 'all', // You can modify this to allow users to select specific fields
-          searchMode,
-          page,
-          resultsPerPage
+      // Alphabet scroll functionality
+      document.querySelector(".alphabet-scroll-sidebar").addEventListener("click", function(event) {
+        if (event.target.tagName === 'A') {
+          event.preventDefault();
+          const letter = event.target.textContent.toLowerCase();
+          if (window.dictionaryData) {
+            const filteredData = window.dictionaryData.filter(entry =>
+              (entry.word || '').toLowerCase().startsWith(letter)
+            );
+            populateTable(filteredData);
+          }
         }
       });
-    }
 
-    // Font selection functionality
-    document.getElementById("fontSelect").addEventListener("change", function() {
-      const selectedFont = this.value;
-      const kashmiriElements = document.querySelectorAll(".kashmiri-font");
-      const urduElements = document.querySelectorAll(".urdu-font");
-      let fontFamily = 'inherit';
-      if (selectedFont === "nastaliq") {
-        fontFamily = "'Noto Nastaliq Urdu', serif";
-      } else if (selectedFont === "naksh") {
-        fontFamily = "'Scheherazade', sans-serif";
-      }
-      kashmiriElements.forEach(el => el.style.fontFamily = fontFamily);
-      urduElements.forEach(el => el.style.fontFamily = fontFamily);
-    });
+      // Font selection functionality
+      document.getElementById("fontSelect").addEventListener("change", function() {
+        const selectedFont = this.value;
+        const kashmiriElements = document.querySelectorAll(".kashmiri-font");
+        const urduElements = document.querySelectorAll(".urdu-font");
+        let fontFamily = 'inherit';
+        if (selectedFont === "nastaliq") {
+          fontFamily = "'Noto Nastaliq Urdu', serif";
+        } else if (selectedFont === "naksh") {
+          fontFamily = "'Scheherazade', sans-serif";
+        }
+        kashmiriElements.forEach(el => el.style.fontFamily = fontFamily);
+        urduElements.forEach(el => el.style.fontFamily = fontFamily);
+      });
 
-    // Dark mode toggle functionality
-    const darkModeToggle = document.getElementById("darkModeToggle");
-    darkModeToggle.addEventListener("click", function() {
-      document.body.classList.toggle("dark-mode");
-      const elements = document.querySelectorAll(
-        ".table-wrapper, #searchInput, .alphabet-scroll-sidebar, " +
-        ".navbar, .dark-mode-switch, .table thead, " +
-        ".slide-toggle, .container-fluid, .font-option"
-      );
-      elements.forEach(el => el.classList.toggle("dark-mode"));
-      // Update dark mode button
-      this.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
-    });
+      // Dark mode toggle functionality
+      const darkModeToggle = document.getElementById("darkModeToggle");
+      darkModeToggle.addEventListener("click", function() {
+        document.body.classList.toggle("dark-mode");
+        const elements = document.querySelectorAll(
+          ".table-wrapper, #searchInput, .alphabet-scroll-sidebar, " +
+          ".navbar, .dark-mode-switch, .table thead, " +
+          ".slide-toggle, .container-fluid, .font-option"
+        );
+        elements.forEach(el => el.classList.toggle("dark-mode"));
+        // Update dark mode button
+        this.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
+      });
 
-    // Section toggle functionality (Home/About)
-    document.querySelectorAll(".slide-toggle").forEach(link => {
-      link.addEventListener("click", function() {
-        const targetId = this.getAttribute("data-target");
-        document.querySelectorAll(".container-fluid > div").forEach(section => {
-          section.style.display = "none";
+      // Section toggle functionality (Home/About)
+      document.querySelectorAll(".slide-toggle").forEach(link => {
+        link.addEventListener("click", function() {
+          const targetId = this.getAttribute("data-target");
+          document.querySelectorAll(".container-fluid > div").forEach(section => {
+            section.style.display = "none";
+          });
+          document.querySelector(targetId).style.display = "block";
+          // Update active state in navigation
+          document.querySelectorAll(".nav-item").forEach(item => {
+            item.classList.remove("active");
+          });
+          this.parentElement.classList.add("active");
         });
-        document.querySelector(targetId).style.display = "block";
-        // Update active state in navigation
-        document.querySelectorAll(".nav-item").forEach(item => {
-          item.classList.remove("active");
-        });
-        this.parentElement.classList.add("active");
       });
     });
-  });
-</script>
   </script>
 </body>
 
