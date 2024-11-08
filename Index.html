@@ -224,7 +224,12 @@
 
       <!-- Search Box -->
       <div class="form-group">
-        <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search by word, translation or example...">
+        <div class="input-group">
+          <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search by word, translation or example...">
+          <div class="input-group-append">
+            <button class="btn btn-primary" id="searchButton">Search</button>
+          </div>
+        </div>
       </div>
 
       <!-- Advanced Search Options -->
@@ -403,9 +408,11 @@
 
       // Search functionality
       const searchInput = document.getElementById("searchInput");
+      const searchButton = document.getElementById("searchButton");
       const advancedSearchSelect = document.getElementById("advancedSearchSelect");
-      searchInput.addEventListener("input", function() {
-        const searchTerm = this.value.toLowerCase().trim();
+
+      function performSearch() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
         const searchBy = advancedSearchSelect.value;
         if (window.dictionaryData) {
           const filteredData = window.dictionaryData.filter(entry => {
@@ -437,7 +444,10 @@
           });
           populateTable(filteredData);
         }
-      });
+      }
+
+      searchInput.addEventListener("input", performSearch);
+      searchButton.addEventListener("click", performSearch);
 
       // Alphabet scroll functionality
       document.querySelector(".alphabet-scroll-sidebar").addEventListener("click", function(event) {
