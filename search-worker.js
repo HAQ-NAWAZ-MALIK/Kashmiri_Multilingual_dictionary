@@ -3,13 +3,7 @@ let dictionaryData = [];
 
 // Function to perform search based on criteria
 function performSearch(searchParams) {
-    const {
-        searchTerm,
-        searchField,
-        searchMode,
-        page,
-        resultsPerPage
-    } = searchParams;
+    const { searchTerm, searchField, searchMode, page, resultsPerPage } = searchParams;
 
     if (!searchTerm) {
         return paginateResults(dictionaryData, page, resultsPerPage);
@@ -51,7 +45,7 @@ function matchValue(value, searchTerm, mode) {
 function paginateResults(data, page, resultsPerPage) {
     const startIndex = (page - 1) * resultsPerPage;
     const endIndex = startIndex + resultsPerPage;
-    
+
     return {
         totalResults: data.length,
         currentPage: page,
