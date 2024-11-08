@@ -261,74 +261,64 @@
             const loadingMessage = document.getElementById("loadingMessage");
             loader.style.display = "block";
             loadingMessage.style.display = "block";
-            let serialNo = 1;
 
-            // Fetch the dictionary data from the GitHub Excel file
-            const excelUrl = "https://raw.githubusercontent.com/HAQ-NAWAZ-MALIK/shruk-website/main/KASHMIRI%20DIC%20%20multilingual.xlsx";
-            fetch(excelUrl)
-                .then(response => response.arrayBuffer())
-                .then(response => {
-                    const workbook = XLSX.read(new Uint8Array(response), { type: 'array' });
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-                    const tableBody = document.getElementById("dictionaryTable");
-                    rows.forEach((row, index) => {
-                        if (index === 0) return; // Skip header row
-                        const columns = row;
-                        if (columns.length >= 12) {
-                            const entry = {
-                                serial_no: serialNo++,
-                                correlated_words_num: columns[0],
-                                word: columns[1],
-                                word_type: columns[2],
-                                english_example: columns[3],
-                                kashmiri_word: columns[4],
-                                kashmiri_example: columns[5],
-                                urdu_word: columns[6],
-                                urdu_translation: columns[7],
-                                chinese_word: columns[8],
-                                chinese_example: columns[9],
-                                turkish_word: columns[10],
-                                turkish_example: columns[11],
-                            };
-                            const rowElement = document.createElement("tr");
-                            rowElement.innerHTML = `
-                                <td>${entry.serial_no}</td>
-                                <td>${entry.correlated_words_num}</td>
-                                <td>${entry.word}</td>
-                                <td>${entry.word_type}</td>
-                                <td>${entry.english_example}</td>
-                                <td class="kashmiri-font">${entry.kashmiri_word}</td>
-                                <td class="kashmiri-font">${entry.kashmiri_example}</td>
-                                <td class="urdu-font">${entry.urdu_word}</td>
-                                <td class="urdu-font">${entry.urdu_translation}</td>
-                                <td>${entry.chinese_word}</td>
-                                <td>${entry.chinese_example}</td>
-                                <td>${entry.turkish_word}</td>
-                                <td>${entry.turkish_example}</td>
-                            `;
-                            tableBody.appendChild(rowElement);
-                        }
-                    });
-                    loader.style.display = "none";
-                    loadingMessage.style.display = "none";
-                })
-                .catch(error => {
-                    console.error("Error fetching Excel data:", error);
-                    loader.style.display = "none";
-                    loadingMessage.style.display = "none";
-                });
+          document.addEventListener("DOMContentLoaded", function () {
+    const loader = document.getElementById("loader");
+    const loadingMessage = document.getElementById("loadingMessage");
+    const tableBody = document.getElementById("dictionaryTable");
+    
+    loader.style.display = "block";
+    loadingMessage.style.display = "block";
 
-            // Search function implementation
-            const searchInput = document.getElementById("searchInput");
-            searchInput.addEventListener("input", function () {
-                const filter = searchInput.value.toLowerCase();
-                const rows = document.querySelectorAll("#dictionaryTable tr");
-                rows.forEach(row => {
-                    const text = row.textContent.toLowerCase();
-                    row.style.display = text.includes(filter) ? "" : "none";
-                });
-            });
+    async function fetchDictionaryData() {
+        try {
+            // Fetch from local JSON file
+            const response = await fetch('kashmiri_dictionary_multilingual.json');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error('Error fetching dictionary data:', error);
+            loadingMessage.textContent = "Error loading dictionary data. Please try again later.";
+            return [];
+        }
+    }
+
+    // Function to populate table with data
+    function populateTable(data) {
+        tableBody.innerHTML = ''; // Clear existing content
+        data.forEach((entry, index) => {
+            const rowElement = document.createElement("tr");
+            rowElement.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${entry.seq_num}</td>
+                <td>${entry.word}</td>
+                <td>${entry.word_type}</td>
+                <td>${entry.english_example}</td>
+                <td class="kashmiri-font">${entry.kashmiri_word}</td>
+                <td class="kashmiri-font">${entry.kashmiri_example}</td>
+                <td class="urdu-font">${entry.urdu_word}</td>
+                <td class="urdu-font">${entry.urdu_translation}</td>
+                <td>${entry.chinese_word}</td>
+                <td>${entry.chinese_example}</td>
+                <td>${entry.turkish_word}</td>
+                <td>${entry.turkish_example}</td>
+            `;
+            tableBody.appendChild(rowElement);
+        });
+    }
+
+    // Fetch and display data
+    fetchDictionaryData().then(data => {
+        populateTable(data);
+        loader.style.display = "none";
+        loadingMessage.style.display = "none";
+    });
+
+    // Rest of your existing code remains the same...
+});
 
             // Alphabet scroll click handling
             document.querySelector(".alphabet-scroll-sidebar").addEventListener("click", function (event) {
@@ -383,7 +373,6 @@
     </script>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
